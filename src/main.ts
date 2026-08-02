@@ -103,6 +103,7 @@ let minimapOn = true;
 let minimapTimer = 0;
 let autosaveTimer = AUTOSAVE_INTERVAL;
 let hintTimer = 25;
+let paused = false;
 
 function resize(): void {
   dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -168,7 +169,16 @@ window.addEventListener('keydown', (e) => {
   keys.add(e.code);
 });
 window.addEventListener('keyup', (e) => keys.delete(e.code));
-window.addEventListener('blur', () => keys.clear());
+window.addEventListener('blur', () => {
+  keys.clear();
+  mouseLeft = false;
+  mouseRight = false;
+  paused = true;
+});
+window.addEventListener('focus', () => {
+  paused = false;
+  last = performance.now();
+});
 window.addEventListener('beforeunload', () => {
   if (ready && savingEnabled) saveGame(world, player, seed, elapsed);
 });
@@ -535,6 +545,7 @@ function hudState(): HudState {
     showHints: hintTimer > 0,
     message,
     boss: boss ? { name: 'King Slime', hp: boss.hp, maxHp: boss.maxHp } : null,
+    paused,
   };
 }
 
@@ -717,7 +728,7 @@ let last = performance.now();
 function frame(now: number): void {
   const dt = Math.min(0.05, (now - last) / 1000);
   last = now;
-  update(dt);
+  if (!paused) update(dt);
   render();
   requestAnimationFrame(frame);
 }

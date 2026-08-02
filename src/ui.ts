@@ -22,6 +22,7 @@ export interface HudState {
   showHints: boolean;
   message: string | null;
   boss: { name: string; hp: number; maxHp: number } | null;
+  paused: boolean;
 }
 
 export type UiAction =
@@ -154,6 +155,19 @@ export function drawHud(
     ctx.textAlign = 'center';
     ctx.fillStyle = 'rgba(255,220,150,0.95)';
     ctx.fillText(state.message, width / 2, origin.y - 14);
+    ctx.textAlign = 'left';
+  }
+
+  if (state.paused && !player.dead) {
+    ctx.fillStyle = 'rgba(8,10,16,0.45)';
+    ctx.fillRect(0, 0, width, height);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(226,234,250,0.9)';
+    ctx.font = '30px ui-monospace, Menlo, monospace';
+    ctx.fillText('paused', width / 2, height / 2);
+    ctx.font = '14px ui-monospace, Menlo, monospace';
+    ctx.fillStyle = 'rgba(190,200,222,0.75)';
+    ctx.fillText('click the window to resume', width / 2, height / 2 + 26);
     ctx.textAlign = 'left';
   }
 
