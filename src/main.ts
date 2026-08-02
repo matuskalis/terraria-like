@@ -55,7 +55,17 @@ const canvas = document.getElementById('game') as HTMLCanvasElement;
 const ctx = canvas.getContext('2d')!;
 const atlas = buildAtlas();
 
-let seed = Math.floor(Math.random() * 1e9);
+/** `?seed=123` generates that exact world and leaves the stored save untouched. */
+function readSeedParam(): number | null {
+  const raw = new URLSearchParams(location.search).get('seed');
+  if (raw === null) return null;
+  const value = Number.parseInt(raw, 10);
+  return Number.isFinite(value) ? Math.abs(value) : null;
+}
+
+const forcedSeed = readSeedParam();
+const savingEnabled = forcedSeed === null;
+let seed = forcedSeed ?? Math.floor(Math.random() * 1e9);
 let world: World;
 let player: Player;
 
@@ -160,7 +170,7 @@ window.addEventListener('keydown', (e) => {
 window.addEventListener('keyup', (e) => keys.delete(e.code));
 window.addEventListener('blur', () => keys.clear());
 window.addEventListener('beforeunload', () => {
-  if (ready) saveGame(world, player, seed, elapsed);
+  if (ready && savingEnabled) saveGame(world, player, seed, elapsed);
 });
 
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
@@ -541,7 +551,7 @@ function update(dt: number): void {
   autosaveTimer -= dt;
   if (autosaveTimer <= 0) {
     autosaveTimer = AUTOSAVE_INTERVAL;
-    if (saveGame(world, player, seed, elapsed)) say('game saved');
+    if (savingEnabled && saveGame(world, player, seed, elapsed)) say('game saved');
   }
 
   const phase = (elapsed % DAY_LENGTH) / DAY_LENGTH;
@@ -713,7 +723,7 @@ function frame(now: number): void {
 }
 
 function start(): void {
-  const save = loadSave();
+  const save = savingEnabled ? loadSave() : null;
   if (save) seed = save.seed;
   world = new World(save ? save.w : WORLD_W, save ? save.h : WORLD_H, seed);
   player = new Player(world.spawnX, world.spawnY);
@@ -725,6 +735,7 @@ function start(): void {
     player.addItem('wood_pick', 1);
     player.addItem('wood_sword', 1);
     player.addItem('torch', 15);
+    if (!savingEnabled) say(`seed ${seed} - this world is not saved`);
   }
   resize();
   cam.x = player.body.x - viewSize().w / 2;
