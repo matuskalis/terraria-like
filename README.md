@@ -57,6 +57,15 @@ around 5–10 KB instead of megabytes. Press `N` for a fresh world.
 
 Two browser tabs share one save slot and will overwrite each other — play in one tab.
 
+The simulation pauses while the window is unfocused, so nothing eats you in a background
+tab.
+
+## Sharing a world
+
+`?seed=12345` generates that exact world. A forced seed runs as a throwaway session: it
+never loads or overwrites your stored save, so you can hand someone a link to an
+interesting world without losing your own.
+
 ## Code map
 
 | File | Responsibility |
