@@ -4,6 +4,8 @@ A 2D survival sandbox in TypeScript + HTML5 canvas. Procedural world, block mini
 building, smooth tile lighting, day/night cycle, four enemy types, a boss, chests,
 crafting, procedural sound, and localStorage saves. No engine, no runtime dependencies.
 
+![Day one in a freshly generated world: health bar, minimap, hotbar and the mined surface layer](docs/screenshot.jpg)
+
 ```bash
 npm install
 npm run dev      # http://localhost:5173
